@@ -1,0 +1,19 @@
+# config.toml file for temp-mail
+[app]
+name = "temp-mail"
+version = "0.1.0"
+debug = true
+
+[server]
+host = "localhost"
+port = 3000
+
+[logging]
+level = "info"
+file = "temp-mail.log"
+
+[domains]
+aliases = ["pageton.org", "devrio.org"]
+
+[database]
+path = "mail.db"
