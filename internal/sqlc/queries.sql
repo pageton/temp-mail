@@ -1,6 +1,7 @@
--- name: InsertEmail :exec
+-- name: InsertEmail :one
 INSERT INTO Email (subject, expiresAt) 
-VALUES (?, ?);
+VALUES (?, ?)
+RETURNING id;
 
 -- name: InsertInbox :exec
 INSERT INTO Inbox (id, emailId, address, textContent, htmlContent) 
