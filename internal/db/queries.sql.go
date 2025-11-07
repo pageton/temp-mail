@@ -123,9 +123,10 @@ func (q *Queries) GetInboxByID(ctx context.Context, id string) (GetInboxByIDRow,
 	return i, err
 }
 
-const insertEmail = `-- name: InsertEmail :exec
+const insertEmail = `-- name: InsertEmail :one
 INSERT INTO Email (subject, expiresAt) 
 VALUES (?, ?)
+RETURNING id
 `
 
 type InsertEmailParams struct {
@@ -133,9 +134,11 @@ type InsertEmailParams struct {
 	Expiresat sql.NullTime
 }
 
-func (q *Queries) InsertEmail(ctx context.Context, arg InsertEmailParams) error {
-	_, err := q.db.ExecContext(ctx, insertEmail, arg.Subject, arg.Expiresat)
-	return err
+func (q *Queries) InsertEmail(ctx context.Context, arg InsertEmailParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, insertEmail, arg.Subject, arg.Expiresat)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const insertEmailAddress = `-- name: InsertEmailAddress :exec
