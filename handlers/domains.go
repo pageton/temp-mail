@@ -1,4 +1,4 @@
-// Package handlers contains the handlers for the API.
+// Package handlers contains the GetDomains handlers for the application.
 package handlers
 
 import (
