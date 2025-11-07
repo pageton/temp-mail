@@ -21,8 +21,9 @@ type AppConfig struct {
 }
 
 type ServerConfig struct {
-	Host string `toml:"host"`
-	Port int    `toml:"port"`
+	Host   string `toml:"host"`
+	Port   int    `toml:"port"`
+	Secret int    `toml:"secret"`
 }
 
 type LoggingConfig struct {
