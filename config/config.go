@@ -9,7 +9,6 @@ import (
 type Config struct {
 	App      AppConfig      `toml:"app"`
 	Server   ServerConfig   `toml:"server"`
-	Logging  LoggingConfig  `toml:"logging"`
 	Domains  DomainsConfig  `toml:"domains"`
 	Database DatabaseConfig `toml:"database"`
 }
@@ -17,18 +16,13 @@ type Config struct {
 type AppConfig struct {
 	Name    string `toml:"name"`
 	Version string `toml:"version"`
-	Debug   bool   `toml:"debug"`
 }
 
 type ServerConfig struct {
-	Host   string `toml:"host"`
-	Port   int    `toml:"port"`
-	Secret int    `toml:"secret"`
-}
-
-type LoggingConfig struct {
-	Level string `toml:"level"`
-	File  string `toml:"file"`
+	Host    string `toml:"host"`
+	Port    int    `toml:"port"`
+	Secret  int    `toml:"secret"`
+	Prefork bool   `toml:"prefork"`
 }
 
 type DomainsConfig struct {
