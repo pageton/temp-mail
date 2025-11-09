@@ -14,7 +14,7 @@ import (
 
 	"github.com/pageton/temp-mail/config"
 	"github.com/pageton/temp-mail/internal/db"
-	"github.com/pageton/temp-mail/utils"
+	"github.com/pageton/temp-mail/internal/utils"
 )
 
 type WebhookResponse struct {
@@ -34,32 +34,32 @@ func Webhook(c *fiber.Ctx) error {
 	env, err := enmime.ReadEnvelope(r)
 	if err != nil {
 		log.Println("Error parsing email:", err)
-		return c.Status(500).SendString("Error parsing email")
+		return c.Status(fiber.StatusInternalServerError).SendString("Error parsing email")
 	}
 	from := env.GetHeader("From")
 	if from == "" {
 		log.Println("Error getting from address:", err)
-		return c.Status(500).SendString("Error getting from address")
+		return c.Status(fiber.StatusInternalServerError).SendString("Error getting from address")
 	}
 	to := env.GetHeader("To")
 	if to == "" {
 		log.Println("Error getting to address:", err)
-		return c.Status(500).SendString("Error getting to address")
+		return c.Status(fiber.StatusInternalServerError).SendString("Error getting to address")
 	}
 	subject := env.GetHeader("Subject")
 	if subject == "" {
 		log.Println("Error getting subject:", err)
-		return c.Status(500).SendString("Error getting subject")
+		return c.Status(fiber.StatusInternalServerError).SendString("Error getting subject")
 	}
 	textBody := env.Text
 	if textBody == "" {
 		log.Println("Error getting body:", err)
-		return c.Status(500).SendString("Error getting body")
+		return c.Status(fiber.StatusInternalServerError).SendString("Error getting body")
 	}
 	htmlBody := env.HTML
 	if htmlBody == "" {
 		log.Println("Error getting html:", err)
-		return c.Status(500).SendString("Error getting html")
+		return c.Status(fiber.StatusInternalServerError).SendString("Error getting html")
 	}
 
 	toAddresses := utils.ParseEmailAddresses(to)
@@ -74,7 +74,7 @@ func Webhook(c *fiber.Ctx) error {
 	)
 	if err != nil {
 		log.Println("Error inserting email:", err)
-		return c.Status(500).SendString("Error inserting email")
+		return c.Status(fiber.StatusInternalServerError).SendString("Error inserting email")
 	}
 	recipientGroups := []struct {
 		Type   string
@@ -96,7 +96,8 @@ func Webhook(c *fiber.Ctx) error {
 			)
 			if err != nil {
 				log.Println("Error inserting email address:", err)
-				return c.Status(500).SendString("Error inserting email address")
+				return c.Status(fiber.StatusInternalServerError).
+					SendString("Error inserting email address")
 			}
 		}
 	}
@@ -113,7 +114,7 @@ func Webhook(c *fiber.Ctx) error {
 		)
 		if err != nil {
 			log.Println("Error inserting inbox:", err)
-			return c.Status(500).SendString("Error inserting inbox")
+			return c.Status(fiber.StatusInternalServerError).SendString("Error inserting inbox")
 		}
 	}
 	res := WebhookResponse{
