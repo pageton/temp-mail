@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	_ "github.com/mattn/go-sqlite3"
@@ -16,16 +17,19 @@ import (
 	"github.com/pageton/temp-mail/handlers"
 	"github.com/pageton/temp-mail/internal/db"
 	"github.com/pageton/temp-mail/internal/sqlc"
+	"github.com/pageton/temp-mail/internal/utils"
+	"github.com/pageton/temp-mail/middlewares"
 )
 
 func main() {
-	app := fiber.New()
-
-	ctx := context.Background()
 	cfg, err := config.LoadConfig("config.toml")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	app := fiber.New(fiber.Config{Prefork: cfg.Server.Prefork})
+
+	ctx := context.Background()
 
 	database, err := sql.Open("sqlite3", cfg.Database.Path)
 	if err != nil {
@@ -62,6 +66,12 @@ func main() {
 		log.Fatal(err)
 	}
 
+	middlewares.Cors(app) // CORS middleware
+
+	middlewares.RateLimiter(app) // Rate limiter middleware
+
+	utils.StartCleanupTicker(ctx, database, time.Hour*2) // Cleanup ticker
+
 	queries := db.New(database)
 
 	app.Use(func(c *fiber.Ctx) error {
@@ -70,9 +80,14 @@ func main() {
 		return c.Next()
 	})
 
-	app.Get("/api/domains", handlers.GetDomains)
-
 	app.Post("/webhook", handlers.Webhook)
 
-	log.Fatal(app.Listen(cfg.Server.Host + ":" + strconv.Itoa(cfg.Server.Port)))
+	api := app.Group("/api")
+	api.Get("/domains", handlers.GetDomains)
+	api.Get("/delete/:inboxid", handlers.DeleteInbox)
+	api.Get("/email/:email", handlers.GetEmail)
+	api.Get("/inbox/:inboxid", handlers.GetInbox)
+
+	addr := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
+	log.Fatal(app.Listen(addr))
 }
