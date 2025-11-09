@@ -16,10 +16,18 @@ import (
 	"github.com/pageton/temp-mail/config"
 	"github.com/pageton/temp-mail/handlers"
 	"github.com/pageton/temp-mail/internal/db"
+	"github.com/pageton/temp-mail/internal/postfix"
 	"github.com/pageton/temp-mail/internal/sqlc"
 	"github.com/pageton/temp-mail/internal/utils"
 	"github.com/pageton/temp-mail/middlewares"
 )
+
+func init() {
+	err := postfix.SetupPostfix()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func main() {
 	cfg, err := config.LoadConfig("config.toml")
