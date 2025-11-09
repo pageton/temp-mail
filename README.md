@@ -41,6 +41,9 @@ go mod tidy
 
 # Run the application
 go run cmd/main.go
+
+# Build the application
+go build -o temp-mail cmd/main.go
 ```
 ## Configuration
 
