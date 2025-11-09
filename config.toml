@@ -1,20 +1,16 @@
 # config.toml file for temp-mail
 [app]
-name = "temp-mail"
-version = "0.1.0"
-debug = true
+name = "temp-mail" # Name of the application
+version = "0.1.0" # Version of the application
 
 [server]
-host = "localhost"
-port = 3000
-secret = 31
-
-[logging]
-level = "info"
-file = "temp-mail.log"
+host = "localhost" # Host to listen
+port = 3000 # Port to listen
+secret = 31 # Secret for webhook
+prefork = false # Enable preforking for better performance
 
 [domains]
-aliases = ["pageton.org", "devrio.org"]
+aliases = ["pageton.org", "devrio.org"] # Domains to postfix
 
 [database]
-path = "mail.db"
+path = "mail.db" # Path to database file
